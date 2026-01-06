@@ -1,20 +1,33 @@
-import AddCompanyDialog from "@/components/AddCompanyDialog";
+import AddCompaniesSection from "@/components/AddCompaniesSection";
 import Tierlist from "@/components/tierlist/Tierlist";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cookies } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+  const cookiesStore = await cookies()
+  const accessToken = cookiesStore.get('accessToken')?.value
+
+  const getCompanies = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/company`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    })
+    if (!response.ok) {
+      throw new Error('Failed to fetch companies')
+    }
+    const data = await response.json()
+    return data
+  }
+
+  const companies = await getCompanies()
+
   return (
     <div className="flex flex-col gap-8 pb-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Ajouter une entreprise</CardTitle>
-          <CardDescription>Il vous reste 10 entreprises à ajouter</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AddCompanyDialog />
-        </CardContent>
-      </Card>
-      <Tierlist />
+      {companies.length < 10 && (
+        <AddCompaniesSection availableCompanies={companies} />
+      )}
+      <Tierlist availableCompanies={companies} />
     </div>
   );
 }

@@ -8,11 +8,13 @@ import { Input } from './ui/input'
 import Image from 'next/image'
 import { addCompany } from '@/actions/company'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function AddCompanyDialog() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState<string>("")
-
+  const router = useRouter()
+  
   const getLogoUrl = (companyName: string) => {
     const token = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN
     return `https://img.logo.dev/name/${companyName}?token=${token}&format=png&size=200`
@@ -31,6 +33,7 @@ export default function AddCompanyDialog() {
       setLogoUrl(null)
       setSearchTerm("")
       toast.success('Entreprise ajoutée avec succès')
+      router.refresh()
     } catch (error) {
       console.error(error)
       const message = error instanceof Error ? error.message : 'Une erreur est survenue'

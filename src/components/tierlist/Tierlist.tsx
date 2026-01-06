@@ -1,12 +1,19 @@
+'use client'
+
 import React from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import Row from './Row'
+import Image from 'next/image'
+import { getLogoUrl } from '@/lib/utils'
+import { Company } from '@/types/company'
 
-const Item = () => {
+const Item = ({ company }: { company: Company }) => {  
   return (
-    <div className='size-20 bg-accent rounded-lg' />
+    <div className='size-20 bg-accent rounded-lg overflow-hidden'>
+      <Image src={getLogoUrl(company.name)} alt={company.name} width={100} height={100} />
+    </div>
   )
 }
 
@@ -27,7 +34,11 @@ const getColor = (rank: string) => {
   }
 }
 
-export default function Tierlist() {
+interface TierlistProps {
+  availableCompanies: Company[]
+}
+
+export default function Tierlist({ availableCompanies }: TierlistProps) {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex gap-4'>
@@ -46,16 +57,13 @@ export default function Tierlist() {
         <li className='w-full'><Row item={{ rank: 'D', color: getColor('D') }} /></li>
       </ul>
       <Card className='flex flex-row gap-2 flex-wrap p-2'>
-        <Item />
-        <Item />
-        <Item />
-        <Item />
-        <Item />
-        <Item />
-        <Item />
-        <Item />
-        <Item />
-        <Item />
+        {availableCompanies.length > 0 ? (
+          availableCompanies.map((company) => (
+            <Item key={company.id} company={company} />
+          ))
+        ) : (
+          <div className='text-center text-gray-500'>Aucune entreprise disponible</div>
+        )}
       </Card>
     </div>
   )
