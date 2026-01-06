@@ -7,6 +7,7 @@ import z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Label } from '@radix-ui/react-label';
+import { redirect } from 'next/navigation';
 
 const schema = z.object({
   email: z.string().email({ message: 'L\'email est requis' }),
@@ -32,8 +33,7 @@ export default function SigninForm() {
       throw new Error('Failed to login user');
     }
 
-    const responseData = await response.json();
-    console.log(responseData);
+    redirect('/');
   });
 
   return (

@@ -1,16 +1,17 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
+import { verifySession } from '@/lib/dal';
+import UserButton from './UserButton';
 
-export default function Header() {
-
-  const isConnected = false;
+export default async function Header() {
+  const session = await verifySession();
 
   const renderUserButton = () => {
-    if (isConnected) {
+    if (session.isAuth) {
       return (
-        <p>User connected</p>
+        <UserButton />
       )
     }
     return (

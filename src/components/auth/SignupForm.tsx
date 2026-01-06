@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { Label } from '../ui/label';
+import { redirect } from 'next/navigation';
 
 const schema = z.object({
   lastName: z.string().min(1, { message: 'Le nom est requis' }),
@@ -34,8 +35,7 @@ export default function SignupForm() {
       throw new Error('Failed to register user');
     }
 
-    const responseData = await response.json();
-    console.log(responseData);
+    redirect('/');
   });
 
   return (
