@@ -22,10 +22,10 @@ export default async function Header() {
   }
 
   return (
-    <header className='flex justify-between items-center px-4 bg-black'>
+    <header className='flex justify-between items-center px-4 border-b border-gray-200 bg-accent'>
       <Image src="/logo2.png" alt="TierListes" width={100} height={100} />
       <nav>
-        <ul className='flex gap-4 text-white'>
+        <ul className='flex gap-4'>
           <li>
             <Link href="/">Accueil</Link>
           </li>
