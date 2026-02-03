@@ -13,13 +13,13 @@ export default function Nav() {
     <nav>
       <ul className='flex gap-8'>
         <li>
-          <Link href="/" className={cn('text-lg', isActive('/') ? 'text-primary font-bold' : 'text-gray-500')}>Accueil</Link>
+          <Link href="/" className={cn('text-lg', isActive('/') ? 'text-primary' : 'text-gray-500')}>Accueil</Link>
         </li>
         <li>
-          <Link href="/my-tier-list" className={cn('text-lg', isActive('/my-tier-list') ? 'text-primary font-bold' : 'text-gray-500')}>Mes tier listes</Link>
+          <Link href="/my-tier-list" className={cn('text-lg', isActive('/my-tier-list') ? 'text-primary' : 'text-gray-500')}>Mes tier listes</Link>
         </li>
         <li>
-          <Link href="/" className={cn('text-lg', isActive('/global') ? 'text-primary font-bold' : 'text-gray-500')}>Global</Link>
+          <Link href="/global-tierlist" className={cn('text-lg', isActive('/global-tierlist') ? 'text-primary' : 'text-gray-500')}>Global</Link>
         </li>
       </ul>
     </nav>

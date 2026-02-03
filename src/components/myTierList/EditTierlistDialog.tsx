@@ -46,7 +46,6 @@ export default function EditTierlistDialog({ id, title }: EditTierlistDialogProp
         throw new Error('Failed to fetch companies')
       }
       const data = await response.json()
-      console.log(data)
       setAvailableCompanies(data)
     }
     getCompanies()

@@ -10,6 +10,7 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { editTierlist, saveTierlist } from '@/actions/tierlist'
 import { toast } from 'sonner'
 import { Item, Tierlist as TierlistType } from '@/types/tierlist'
+import { useRouter } from 'next/navigation'
 
 const getColor = (rank: string) => {
   switch (rank) {
@@ -38,6 +39,7 @@ type RowAssignments = {
 }
 
 export default function Tierlist({ availableCompanies, existingTierlist }: TierlistProps) {
+  const router = useRouter()
   const [name, setName] = useState(() => existingTierlist?.title || '')
   const [rowAssignments, setRowAssignments] = useState<RowAssignments>({
     'S': [],
@@ -125,7 +127,7 @@ export default function Tierlist({ availableCompanies, existingTierlist }: Tierl
       const items: Item[] = []
       if(Object.keys(rowAssignments).length > 0) {
         for (const [rowId, companyIds] of Object.entries(rowAssignments)) {
-          if(companyIds.length > 0) {
+          if(rowId !== 'unassigned' && companyIds.length > 0) {
             for (const companyId of companyIds) {
               items.push({
                 category: rowId,
@@ -135,6 +137,7 @@ export default function Tierlist({ availableCompanies, existingTierlist }: Tierl
           }
         }
       }
+      
       if(!existingTierlist) {
         await saveTierlist(name, items)
         setRowAssignments({
@@ -149,6 +152,7 @@ export default function Tierlist({ availableCompanies, existingTierlist }: Tierl
       } else {
         await editTierlist(existingTierlist.id, name, items)
       }
+      router.refresh()
       toast.success('Tier liste sauvegardée avec succès')
     } catch {
       toast.error('Erreur lors de la sauvegarde de la tier liste')
