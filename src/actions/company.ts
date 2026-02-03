@@ -1,9 +1,8 @@
 "use server"
 
 export const addCompany = async (name: string) => {
-  console.log(name);
   
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/company`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logos`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,12 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import Row from './Row'
 import UnassignedZone from './UnassignedZone'
 import { Company } from '@/types/company'
 import { DndContext, DragEndEvent } from '@dnd-kit/core'
+import { editTierlist, saveTierlist } from '@/actions/tierlist'
+import { toast } from 'sonner'
+import { Item, Tierlist as TierlistType } from '@/types/tierlist'
 
 const getColor = (rank: string) => {
   switch (rank) {
@@ -27,13 +30,15 @@ const getColor = (rank: string) => {
 
 interface TierlistProps {
   availableCompanies: Company[]
+  existingTierlist?: TierlistType
 }
 
 type RowAssignments = {
   [rowId: string]: string[]
 }
 
-export default function Tierlist({ availableCompanies }: TierlistProps) {
+export default function Tierlist({ availableCompanies, existingTierlist }: TierlistProps) {
+  const [name, setName] = useState(() => existingTierlist?.title || '')
   const [rowAssignments, setRowAssignments] = useState<RowAssignments>({
     'S': [],
     'A': [],
@@ -42,6 +47,39 @@ export default function Tierlist({ availableCompanies }: TierlistProps) {
     'D': [],
     'unassigned': availableCompanies.map(c => c.id)
   })
+
+  useEffect(() => {
+    const initRowAssignments = () => {
+      if (!existingTierlist) return
+      
+      const newAssignments: RowAssignments = {
+        'S': [],
+        'A': [],
+        'B': [],
+        'C': [],
+        'D': [],
+        'unassigned': []
+      }
+
+      const assignedCompanyIds = new Set<string>()
+      for (const item of existingTierlist.items) {
+        if (!newAssignments[item.category]) {
+          newAssignments[item.category] = []
+        }
+        newAssignments[item.category].push(item.logoId)
+        assignedCompanyIds.add(item.logoId)
+      }
+      
+      // Add unassigned companies (those not in any category)
+      newAssignments.unassigned = availableCompanies
+        .map(c => c.id)
+        .filter(id => !assignedCompanyIds.has(id))
+      
+      setRowAssignments(newAssignments)
+    }
+
+    initRowAssignments()
+  }, [existingTierlist, availableCompanies])
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -82,6 +120,41 @@ export default function Tierlist({ availableCompanies }: TierlistProps) {
       .filter((c): c is Company => c !== undefined)
   }
 
+  const handleSave = async () => {
+    try {
+      const items: Item[] = []
+      if(Object.keys(rowAssignments).length > 0) {
+        for (const [rowId, companyIds] of Object.entries(rowAssignments)) {
+          if(companyIds.length > 0) {
+            for (const companyId of companyIds) {
+              items.push({
+                category: rowId,
+                logoId: companyId
+              })
+            }
+          }
+        }
+      }
+      if(!existingTierlist) {
+        await saveTierlist(name, items)
+        setRowAssignments({
+          'S': [],
+          'A': [],
+          'B': [],
+          'C': [],
+          'D': [],
+          'unassigned': availableCompanies.map(c => c.id)
+        })
+        setName('')
+      } else {
+        await editTierlist(existingTierlist.id, name, items)
+      }
+      toast.success('Tier liste sauvegardée avec succès')
+    } catch {
+      toast.error('Erreur lors de la sauvegarde de la tier liste')
+    }
+  }
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
     <div className='flex flex-col gap-4'>
@@ -90,8 +163,10 @@ export default function Tierlist({ availableCompanies }: TierlistProps) {
           type="text"
           placeholder="Nom de la tier liste"
           className='flex-1'
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
-        <Button>Sauvegarder</Button>
+        <Button onClick={handleSave}>Sauvegarder</Button>
       </div>
       <ul className='w-full rounded-lg overflow-hidden'>
         <li className='w-full'>

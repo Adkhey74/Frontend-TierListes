@@ -7,7 +7,7 @@ export default async function Home() {
   const accessToken = cookiesStore.get('accessToken')?.value
 
   const getCompanies = async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/company`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logos`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`
